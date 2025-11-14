@@ -8,7 +8,7 @@ void cadastrarLivro(livro **livros, int *qnt){
     
     printf("-- Cadastro de Livro --\n");
     printf("Codigo: ");
-    scanf("%d", &novo.cod);
+    scanf("%d", &novo.cod); // com
     getchar();
 
     printf("Titulo: ");
