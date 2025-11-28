@@ -47,3 +47,5 @@ int main(){
         printf("Opcao inválida!\n");//Adicionei mais algumas opções - Crystian
     }  
 }while(op != 0);//O switch tava fora do do-while - Crystian
+ return 0;
+}
