@@ -43,3 +43,27 @@ void cadastrarLivro(livro **livros, int *qnt){
     salvarLivros(*livros, *qnt); //atualiza o arquivo txt
     
 }
+
+void registrarEmprestimo(livro **livros, int qnt, emprestimo *emprestimos, int qntEmp){
+    emprestimo novo; //cria nova variavel do tipo emprestimo, novo
+
+    printf("Registro de Emprestimo:\n");
+    printf("Digite o codigo do livro: ");
+    scanf("%d", &novo.codLivro);
+    printf("Digite o nome do livro: ");
+    fgets(novo.nomeLeitor, 100, stdin);
+    
+    FILE *arquivo;
+    fopen("emprestimo.txt", "r"); //abre arquivo emprestimo.txt
+    if(!arquivo){
+        printf("Arquivo 'emprestimo.txt' nao encontrado!\n");
+        return; 
+    }
+
+    char linha[300];
+    while(fgets(linha, sizeof(linha), arquivo)){
+        linha[strcspn(linha, "\n")] = 0;
+    }
+    
+}
+

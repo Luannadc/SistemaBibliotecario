@@ -35,7 +35,7 @@ int main(){
         registrarEmprestimo(livros, qnt, &emprestimos, &qntEmp);
         break;
     case 5:
-        registrarDevolucao(&livros, qnt);
+        registrarDevolucao(livros, qnt);
         break;
     case 6:
         relatorioEmprestimos();
