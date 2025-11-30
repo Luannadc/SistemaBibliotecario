@@ -50,20 +50,38 @@ void registrarEmprestimo(livro **livros, int qnt, emprestimo *emprestimos, int q
     printf("Registro de Emprestimo:\n");
     printf("Digite o codigo do livro: ");
     scanf("%d", &novo.codLivro);
+    getchar();
+
     printf("Digite o nome do livro: ");
     fgets(novo.nomeLeitor, 100, stdin);
-    
-    FILE *arquivo;
-    fopen("emprestimo.txt", "r"); //abre arquivo emprestimo.txt
+    novo.nomeLeitor[strcspn(novo.nomeLeitor, "\n")] = 0;
+
+    //verifica se o livro existe no sistema
+    int encontrado = 0;
+    for(int i = 0; i < qnt; i++){
+        if((*livros)[i].cod == novo.codLivro){ //verifica se o cod do livro digitado pelo ususario corresponde ao cod do livro atual 
+            encontrado = 1;
+            break;
+        }
+    }
+
+    if(!encontrado){
+        printf("Livro nao encontrado!\n");
+        return;
+    }
+
+    FILE *arquivo = fopen("emprestimo.txt", "a"); //abre arquivo emprestimo.txt
     if(!arquivo){
         printf("Arquivo 'emprestimo.txt' nao encontrado!\n");
         return; 
     }
 
-    char linha[300];
-    while(fgets(linha, sizeof(linha), arquivo)){
-        linha[strcspn(linha, "\n")] = 0;
-    }
-    
+    //salva no arquivo
+    fprintf(arquivo, "%d;%s;\n", novo.codLivro, novo.nomeLeitor);
+    fclose(arquivo);
+
+    emprestimos[qntEmp] = novo; //salva o novo emprestimo dentro do vetor de emprestimos que ja existe na memoria 
+
+    printf("Emprestimo registrado com sucesso!\n");  
 }
 
