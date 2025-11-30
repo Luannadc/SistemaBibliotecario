@@ -85,3 +85,33 @@ void registrarEmprestimo(livro **livros, int qnt, emprestimo *emprestimos, int q
     printf("Emprestimo registrado com sucesso!\n");  
 }
 
+void registrarDevolucao(livro **livros, int qnt){
+    int cod, idx = -1;
+    printf("Registro de Devolução:\n");
+    printf("Digite o codigo do livro: ");
+    if(scanf("%d", &cod) != 1){
+        printf("Codigo Inválido.\n");
+        getchar();
+        return;
+    }
+    getchar();
+
+    for(int i = 0; i < qnt; i++){
+        if((*livros)[i].cod == cod){
+            idx = i;
+            break;
+        }
+    }
+
+    if(idx == -1){
+        printf("Codigo Inválido.\n");
+        return;
+    }
+
+    //atualiza o estoque
+    (*livros)[idx].qnt++;
+    salvarLivros(*livros, qnt);
+
+    printf("Devolução registrada: '%s' (cod %d). Estoque agora: %d\n", (*livros)[idx].titulo, cod, (*livros)[idx].qnt);
+   
+}
