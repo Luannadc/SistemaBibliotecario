@@ -223,7 +223,7 @@ void buscarLivro(livro *livros, int qnt){
         int achou = 0;
 
         for(int i = 0; i < qnt; i++){
-            if(strcasestr(livros[i].titulo, busca)){
+            if(strcasecmp(livros[i].titulo, busca)){
                 achou = 1;
 
                 printf("\nLivro encontrado:\n");

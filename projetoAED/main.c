@@ -26,10 +26,10 @@ int main(){
         cadastrarLivro(&livros, &qnt);
         break;
     case 2:
-        buscarLivro(livros, qnt);
+        buscarLivro(&livros, qnt);
         break;
     case 3:
-        listarLivro(livros, qnt);
+        listarLivro(&livros, qnt);
         break;
     case 4:
         registrarEmprestimo(&livros, qnt, &emprestimos, &qntEmp);
