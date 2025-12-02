@@ -44,49 +44,61 @@ void cadastrarLivro(livro **livros, int *qnt){
     
 }
 
-void registrarEmprestimo(livro **livros, int qnt, emprestimo *emprestimos, int qntEmp){
+void registrarEmprestimo(livro **livros, int qnt, emprestimo **emprestimos, int *qntEmp){
     emprestimo novo; //cria nova variavel do tipo emprestimo, novo
 
     printf("Registro de Emprestimo:\n");
     printf("Digite o codigo do livro: ");
-    scanf("%d", &novo.codLivro);
+    if(scanf("%d", &novo.codLivro) != 1){
+        printf("Código Inválido.\n");
+        getchar();
+        return;
+    }
     getchar();
-
-    printf("Digite o nome do livro: ");
+    printf("Digite o nome do leitor: ");
     fgets(novo.nomeLeitor, 100, stdin);
     novo.nomeLeitor[strcspn(novo.nomeLeitor, "\n")] = 0;
 
     //verifica se o livro existe no sistema
-    int encontrado = 0;
+    int idx = -1; 
     for(int i = 0; i < qnt; i++){
         if((*livros)[i].cod == novo.codLivro){ //verifica se o cod do livro digitado pelo ususario corresponde ao cod do livro atual 
-            encontrado = 1;
+            idx = i;
             break;
         }
     }
 
-    if(!encontrado){
+    //caso o livro nao seja encontrado
+    if(idx == -1){
         printf("Livro nao encontrado!\n");
         return;
     }
 
-    FILE *arquivo = fopen("emprestimo.txt", "a"); //abre arquivo emprestimo.txt
-    if(!arquivo){
-        printf("Arquivo 'emprestimo.txt' nao encontrado!\n");
-        return; 
+    //sem estoque
+    if((*livros)[idx].qnt <= 0){
+        printf("Livro '%s' sem estoque.\n", (*livros)[idx].titulo);
+        return;
     }
 
-    //salva no arquivo
-    fprintf(arquivo, "%d;%s;\n", novo.codLivro, novo.nomeLeitor);
-    fclose(arquivo);
+    printf("Digite a data (dd/mm/aaaa): ");
+    fgets(novo.data, 20, stdin);
+    novo.data[strcspn(novo.data, "\r\n")] = '\0';
 
-    emprestimos[qntEmp] = novo; //salva o novo emprestimo dentro do vetor de emprestimos que ja existe na memoria 
+   (*livros)[idx].qnt--;
+    salvarLivros(*livros, qnt);
 
-    printf("Emprestimo registrado com sucesso!\n");  
+    emprestimo *tmp = realloc(*emprestimos, (*qntEmp + 1) * sizeof(emprestimo)); //realoca memoria para o vetor de emprestimos com espaco para mais 1 elemento; retorna novo ponteiro tmp
+    *emprestimos = tmp;
+    (*emprestimos)[*qntEmp] = novo; //salva o novo emprestimo dentro do vetor de emprestimos que ja existe na memoria 
+    (*qntEmp)++;
+
+    printf("Emprestimo registrado com sucesso! Estoque atual: %d\n", (*livros)[idx].qnt);  
+    salvarEmprestimo(*emprestimos, *qntEmp);
 }
 
 void registrarDevolucao(livro **livros, int qnt){
     int cod, idx = -1;
+
     printf("Registro de Devolução:\n");
     printf("Digite o codigo do livro: ");
     if(scanf("%d", &cod) != 1){
@@ -114,4 +126,56 @@ void registrarDevolucao(livro **livros, int qnt){
 
     printf("Devolução registrada: '%s' (cod %d). Estoque agora: %d\n", (*livros)[idx].titulo, cod, (*livros)[idx].qnt);
    
+}
+
+void salvarEmprestimo(emprestimo *emprestimos, int qnt){
+    FILE *arquivo = fopen("emprestimo.txt", "w");
+    if(!arquivo){
+        printf("Erro ao abrir 'emprestimo.txt' para escrita.\n");
+        return;
+    }
+
+    for(int i = 0; i < qnt; i++){
+        fprintf(arquivo, "%d;%s;%s\n", emprestimos[i].codLivro, emprestimos[i].nomeLeitor, emprestimos[i].data);
+    }
+
+    fclose(arquivo);
+}
+
+//carrega todos os emprestimos salvos no arquivo e reconstroi o vetor na memória, quando o programa é iniciado.
+void carregarEmprestimos(emprestimo **emprestimos, int *qnt){
+    emprestimo novo;
+    *qnt = 0;
+    *emprestimos = NULL;
+    
+    FILE *arquivo = fopen("emprestimo.txt", "r"); //abre o arquivo para ler e escrever; o arquivo deve existir
+    if(!arquivo){
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
+
+    //ler cada linha do arquivo
+     char linha[256];
+
+    while(fgets(linha, sizeof(linha), arquivo) != NULL){
+     char nomeTemp[100], dataTemp[20];
+
+     if(sscanf(linha, "%d;%99[^;];%19s", &novo.codLivro, nomeTemp, dataTemp) == 3){
+   
+         strcpy(novo.nomeLeitor, nomeTemp);
+         strcpy(novo.data, dataTemp);
+            
+         emprestimo *aux = realloc(*emprestimos, (*qnt + 1) * sizeof(emprestimo));
+         if(!aux){
+            printf("Erro ao alocar memoria.\n");
+            fclose(arquivo);
+            return;
+        }
+
+        *emprestimos = aux;
+        (*emprestimos)[*qnt] = novo;
+        (*qnt)++;
+        }
+    }
+    fclose(arquivo);
 }

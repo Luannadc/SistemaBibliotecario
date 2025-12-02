@@ -32,10 +32,10 @@ int main(){
         listarLivro(livros, qnt);
         break;
     case 4:
-        registrarEmprestimo(livros, qnt, &emprestimos, &qntEmp);
+        registrarEmprestimo(&livros, qnt, &emprestimos, &qntEmp);
         break;
     case 5:
-        registrarDevolucao(livros, qnt);
+        registrarDevolucao(&livros, qnt);
         break;
     case 6:
         relatorioEmprestimos();
