@@ -251,7 +251,7 @@ void buscarLivro(livro *livros, int qnt){
         int achou = 0;
 
         for(int i = 0; i < qnt; i++){
-            if(strcasestr(livros[i].autor, busca)){
+            if(strcasecmp(livros[i].autor, busca)){
                 achou = 1;
 
                 printf("\nLivro encontrado:\n");
@@ -323,3 +323,40 @@ void carregarLivros(livro **livros, int *qnt){
 
     fclose(arquivo);
 }//Carregar livros
+
+void relatorioEmprestimos() {
+    FILE *arquivo = fopen("emprestimo.txt", "r");
+    if (!arquivo) {
+        printf("Erro ao abrir o arquivo.\n");
+        exit(1);
+    }
+
+    char linha[500];
+    printf("-- Relatório de Empréstimos --\n");
+    printf("%-8s | %-30s | %-20s | %-10s\n", "CODIGO", "TITULO", "LEITOR", "DATA");
+
+    while (fgets(linha, sizeof(linha), arquivo)) {
+
+        linha[strcspn(linha, "\r\n")] = '\0'; // remove quebra de linha
+
+        int cod;
+        char titulo[150];
+        char leitor[100];
+        char data[20];
+
+        int n = sscanf(
+            linha,
+            "%d;%[^;];%[^;];%[^;]",
+            &cod, titulo, leitor, data
+        );
+
+        if (n != 4) {
+            // linha inválida, ignora
+            continue;
+        }
+
+        printf("%-8d | %-30s | %-20s | %-10s\n", cod, titulo, leitor, data);
+    }
+
+    fclose(arquivo);
+}

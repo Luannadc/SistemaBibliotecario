@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "funcoes.h"
 
 int main(){
@@ -20,16 +21,17 @@ int main(){
         printf("0. Sair\n");
         printf("Digite sua escolha: ");
         scanf("%d", &op);
+        getchar();
 
-    switch (op){
+        switch (op){
     case 1:
         cadastrarLivro(&livros, &qnt);
         break;
     case 2:
-        buscarLivro(&livros, qnt);
+        buscarLivro(livros, qnt);
         break;
     case 3:
-        listarLivro(&livros, qnt);
+        listarLivro(livros, qnt);
         break;
     case 4:
         registrarEmprestimo(&livros, qnt, &emprestimos, &qntEmp);
