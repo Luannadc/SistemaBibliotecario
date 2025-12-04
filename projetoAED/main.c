@@ -18,9 +18,9 @@ int main(){
         printf("1. Cadastrar Livros\n");
         printf("2. Buscar Livros\n");
         printf("3. Listar Livros\n");
-        printf("4. Registrar Empréstimo\n");
-        printf("5. Registrar Devolução\n");
-        printf("6. Relatório\n");
+        printf("4. Registrar Emprestimo\n");
+        printf("5. Registrar Devolucao\n");
+        printf("6. Relatorio\n");
         printf("0. Sair\n");
         printf("Digite sua escolha: ");
         scanf("%d", &op);
@@ -49,7 +49,7 @@ int main(){
             printf("Encerrando...\n");
             break;
         default:
-            printf("Opcao inválida!\n");//Adicionei mais algumas opções - Crystian
+            printf("Opcao invalida!\n");//Adicionei mais algumas opções - Crystian
     }  
 }while(op != 0);//O switch tava fora do do-while - Crystian
  return 0;
