@@ -10,7 +10,7 @@
                 "-Wextra",
                 "-g3",
                 "${workspaceFolder}/projetoAED/main.c",
-                "${workspaceFolder}/projetoAED/funcoes.c",
+                "${workspaceFolder}/projetoAED/funcoes.c",   
                 "-o",
                 "${workspaceFolder}/projetoAED/output/main.exe"
             ],
