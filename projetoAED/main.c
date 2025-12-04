@@ -9,6 +9,9 @@ int main(){
 
     int op, qnt = 0;
     int qntEmp = 0;
+
+    carregarLivros(&livros, &qnt);
+    carregarEmprestimos(&emprestimos, &qntEmp);
     
     do{
         printf("==== MENU ====\n");
@@ -23,30 +26,30 @@ int main(){
         scanf("%d", &op);
         getchar();
 
-        switch (op){
-    case 1:
-        cadastrarLivro(&livros, &qnt);
-        break;
-    case 2:
-        buscarLivro(livros, qnt);
-        break;
-    case 3:
-        listarLivro(livros, qnt);
-        break;
-    case 4:
-        registrarEmprestimo(&livros, qnt, &emprestimos, &qntEmp);
-        break;
-    case 5:
-        registrarDevolucao(&livros, qnt);
-        break;
-    case 6:
-        relatorioEmprestimos();
-        break;
-    case 0:
-        printf("Encerrando...\n");
-        break;
-    default:
-        printf("Opcao inválida!\n");//Adicionei mais algumas opções - Crystian
+    switch (op){
+        case 1:
+            cadastrarLivro(&livros, &qnt);
+            break;
+        case 2:
+            buscarLivro(livros, qnt);
+            break;
+        case 3:
+            listarLivro(livros, qnt);
+            break;
+        case 4:
+            registrarEmprestimo(&livros, qnt, &emprestimos, &qntEmp);
+            break;
+        case 5:
+            registrarDevolucao(&livros, qnt);
+            break;
+        case 6:
+            relatorioEmprestimos();
+            break;
+        case 0:
+            printf("Encerrando...\n");
+            break;
+        default:
+            printf("Opcao inválida!\n");//Adicionei mais algumas opções - Crystian
     }  
 }while(op != 0);//O switch tava fora do do-while - Crystian
  return 0;

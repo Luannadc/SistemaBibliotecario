@@ -150,7 +150,6 @@ void carregarEmprestimos(emprestimo **emprestimos, int *qnt){
     
     FILE *arquivo = fopen("emprestimo.txt", "r"); //abre o arquivo para ler e escrever; o arquivo deve existir
     if(!arquivo){
-        printf("Erro ao abrir o arquivo.\n");
         return;
     }
 
@@ -223,7 +222,7 @@ void buscarLivro(livro *livros, int qnt){
         int achou = 0;
 
         for(int i = 0; i < qnt; i++){
-            if(strcasecmp(livros[i].titulo, busca)){
+            if(strcasecmp(livros[i].titulo, busca) == 0){
                 achou = 1;
 
                 printf("\nLivro encontrado:\n");
@@ -251,7 +250,7 @@ void buscarLivro(livro *livros, int qnt){
         int achou = 0;
 
         for(int i = 0; i < qnt; i++){
-            if(strcasecmp(livros[i].autor, busca)){
+            if(strcasecmp(livros[i].autor, busca) == 0){
                 achou = 1;
 
                 printf("\nLivro encontrado:\n");
@@ -333,29 +332,24 @@ void relatorioEmprestimos() {
 
     char linha[500];
     printf("-- Relatório de Empréstimos --\n");
-    printf("%-8s | %-30s | %-20s | %-10s\n", "CODIGO", "TITULO", "LEITOR", "DATA");
+    printf("%-8s | %-30s | %-10s\n", "CODIGO", "LEITOR", "DATA");
 
     while (fgets(linha, sizeof(linha), arquivo)) {
 
         linha[strcspn(linha, "\r\n")] = '\0'; // remove quebra de linha
 
         int cod;
-        char titulo[150];
         char leitor[100];
         char data[20];
 
-        int n = sscanf(
-            linha,
-            "%d;%[^;];%[^;];%[^;]",
-            &cod, titulo, leitor, data
-        );
+        int n = sscanf(linha, "%d;%[^;];%[^;]", &cod, leitor, data);
 
-        if (n != 4) {
+        if (n != 3) {
             // linha inválida, ignora
             continue;
         }
 
-        printf("%-8d | %-30s | %-20s | %-10s\n", cod, titulo, leitor, data);
+        printf("%-8d | %-20s | %-10s\n", cod, leitor, data);
     }
 
     fclose(arquivo);
