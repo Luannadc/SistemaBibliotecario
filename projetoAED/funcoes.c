@@ -74,7 +74,7 @@ void registrarEmprestimo(livro **livros, int qnt, emprestimo **emprestimos, int 
         return;
     }
 
-    //sem estoque
+    //caso o livro esteja sem estoque
     if((*livros)[idx].qnt <= 0){
         printf("Livro '%s' sem estoque.\n", (*livros)[idx].titulo);
         return;
@@ -109,7 +109,7 @@ void registrarDevolucao(livro **livros, int qnt){
     getchar();
 
     for(int i = 0; i < qnt; i++){
-        if((*livros)[i].cod == cod){
+        if((*livros)[i].cod == cod){ 
             idx = i;
             break;
         }
@@ -120,8 +120,8 @@ void registrarDevolucao(livro **livros, int qnt){
         return;
     }
 
-    //atualiza o estoque
-    (*livros)[idx].qnt++;
+    //atualiza o estoque 
+    (*livros)[idx].qnt++; 
     salvarLivros(*livros, qnt);
 
     printf("Devolução registrada: '%s' (cod %d). Estoque agora: %d\n", (*livros)[idx].titulo, cod, (*livros)[idx].qnt);
@@ -136,7 +136,7 @@ void salvarEmprestimo(emprestimo *emprestimos, int qnt){
     }
 
     for(int i = 0; i < qnt; i++){
-        fprintf(arquivo, "%d;%s;%s\n", emprestimos[i].codLivro, emprestimos[i].nomeLeitor, emprestimos[i].data);
+        fprintf(arquivo, "%d;%s;%s\n", emprestimos[i].codLivro, emprestimos[i].nomeLeitor, emprestimos[i].data); //escreve o emprestimo no arquivo txt
     }
 
     fclose(arquivo);
@@ -156,24 +156,24 @@ void carregarEmprestimos(emprestimo **emprestimos, int *qnt){
     //ler cada linha do arquivo
      char linha[256];
 
-    while(fgets(linha, sizeof(linha), arquivo) != NULL){
+    while(fgets(linha, sizeof(linha), arquivo) != NULL){ //enquanto fgets diferente de NULL 
      char nomeTemp[100], dataTemp[20];
 
-     if(sscanf(linha, "%d;%99[^;];%19s", &novo.codLivro, nomeTemp, dataTemp) == 3){
+     if(sscanf(linha, "%d;%99[^;];%19s", &novo.codLivro, nomeTemp, dataTemp) == 3){ //le a linha no formato "cod;nome;data" e verifica se os 3 campos foram lidos corretamente
    
-         strcpy(novo.nomeLeitor, nomeTemp);
-         strcpy(novo.data, dataTemp);
+         strcpy(novo.nomeLeitor, nomeTemp); //copia o nome lido (nomeTemp) para o campo nomeLeitor do novo emprestimo
+         strcpy(novo.data, dataTemp); //copia a data lida (dataTemp) para o campo data do novo emprestimo
             
-         emprestimo *aux = realloc(*emprestimos, (*qnt + 1) * sizeof(emprestimo));
+        emprestimo *aux = realloc(*emprestimos, (*qnt + 1) * sizeof(emprestimo)); //aumenta o vetor de emprestimos na memoria para caber mais 1 registro e retorna o novo ponteiro (ou null se faltar memoria)
          if(!aux){
             printf("Erro ao alocar memoria.\n");
             fclose(arquivo);
             return;
-        }
+     }
 
-        *emprestimos = aux;
-        (*emprestimos)[*qnt] = novo;
-        (*qnt)++;
+        *emprestimos = aux; //atualiza ponteiro emprestimos para apontar para a nova area de memoria realocada
+        (*emprestimos)[*qnt] = novo; //coloca o novo emprestimo na posicao final do vetor (indice *qnt)
+        (*qnt)++; //incrementa o contador para que agora temos mais 1 emprestimo na memoria
         }
     }
     fclose(arquivo);
