@@ -96,10 +96,11 @@ void registrarEmprestimo(livro **livros, int qnt, emprestimo **emprestimos, int 
     salvarEmprestimo(*emprestimos, *qntEmp);
 }
 
-void registrarDevolucao(livro **livros, int qnt){
+void registrarDevolucao(livro **livros, int qnt, emprestimo **emprestimos, int *qntEmp){
     int cod, idx = -1;
+    char nomeLeitor[100];
 
-    printf("Registro de Devolução:\n");
+    printf("Registro de Devolucao:\n");
     printf("Digite o codigo do livro: ");
     if(scanf("%d", &cod) != 1){
         printf("Codigo Inválido.\n");
@@ -107,6 +108,13 @@ void registrarDevolucao(livro **livros, int qnt){
         return;
     }
     getchar();
+
+    printf("Digite o nome do leitor que esta devolvendo o livro: "); //deve-se atualizar essa linha 
+    if(!fgets(nomeLeitor, sizeof(nomeLeitor), stdin)){
+        printf("Erro ao ler nome.\n");
+        return;
+    }
+    nomeLeitor[strcspn(nomeLeitor, "\r\n")] = '\0';
 
     for(int i = 0; i < qnt; i++){
         if((*livros)[i].cod == cod){ 
@@ -124,7 +132,21 @@ void registrarDevolucao(livro **livros, int qnt){
     (*livros)[idx].qnt++; 
     salvarLivros(*livros, qnt);
 
-    printf("Devolução registrada: '%s' (cod %d). Estoque agora: %d\n", (*livros)[idx].titulo, cod, (*livros)[idx].qnt);
+    //remove o emprestimo do vetor em memoria 
+    for(int i = 0; i < *qntEmp; i++){
+        if((*emprestimos)[i].codLivro == cod && strcmp((*emprestimos)[i].nomeLeitor, nomeLeitor) == 0){
+            //encontrou o emprestimo, remove deslocando os restantes + 1
+            for(int j = i; j < *qntEmp - 1; j++){
+                (*emprestimos)[j] = (*emprestimos)[j + 1];
+            }
+            (*qntEmp)--;
+            break;
+        }
+
+    }
+
+    salvarEmprestimo(*emprestimos, *qntEmp);
+    printf("Devolucao registrada: '%s' (cod %d). Estoque agora: %d\n", (*livros)[idx].titulo, cod, (*livros)[idx].qnt);
    
 }
 
@@ -187,8 +209,8 @@ void listarLivro(livro *livros, int qnt){
 
     printf("\n--- Lista de Livros ---\n");
     for(int i = 0; i < qnt; i++){
-        printf("Código: %d\n", livros[i].cod);
-        printf("Título: %s\n", livros[i].titulo);
+        printf("Codigo: %d\n", livros[i].cod);
+        printf("Titulo: %s\n", livros[i].titulo);
         printf("Autor: %s\n", livros[i].autor);
         printf("Ano: %d\n", livros[i].ano);
         printf("Quantidade: %d\n", livros[i].qnt);
@@ -204,9 +226,9 @@ void buscarLivro(livro *livros, int qnt){
 
     int opc;
     printf("-- Buscar Livro --\n");
-    printf("1 - Buscar por título\n");
+    printf("1 - Buscar por titulo\n");
     printf("2 - Buscar por autor\n");
-    printf("Opção: ");
+    printf("Opcao: ");
     scanf("%d", &opc);
     getchar();
 
@@ -215,7 +237,7 @@ void buscarLivro(livro *livros, int qnt){
     
     if(opc == 1){
         char busca[150];
-        printf("Digite parte do título: ");
+        printf("Digite o titulo: ");
         fgets(busca, 150, stdin);
         busca[strcspn(busca, "\n")] = 0;
 
@@ -226,8 +248,8 @@ void buscarLivro(livro *livros, int qnt){
                 achou = 1;
 
                 printf("\nLivro encontrado:\n");
-                printf("Código: %d\n", livros[i].cod);
-                printf("Título: %s\n", livros[i].titulo);
+                printf("Codigo: %d\n", livros[i].cod);
+                printf("Titulo: %s\n", livros[i].titulo);
                 printf("Autor: %s\n", livros[i].autor);
                 printf("Ano: %d\n", livros[i].ano);
                 printf("Quantidade: %d\n\n", livros[i].qnt);
@@ -235,7 +257,7 @@ void buscarLivro(livro *livros, int qnt){
         }
 
         if(!achou)
-            printf("Nenhum livro encontrado com esse título!\n");
+            printf("Nenhum livro encontrado com esse titulo!\n");
     }
 
    
@@ -254,8 +276,8 @@ void buscarLivro(livro *livros, int qnt){
                 achou = 1;
 
                 printf("\nLivro encontrado:\n");
-                printf("Código: %d\n", livros[i].cod);
-                printf("Título: %s\n", livros[i].titulo);
+                printf("Codigo: %d\n", livros[i].cod);
+                printf("Titulo: %s\n", livros[i].titulo);
                 printf("Autor: %s\n", livros[i].autor);
                 printf("Ano: %d\n", livros[i].ano);
                 printf("Quantidade: %d\n\n", livros[i].qnt);
@@ -267,7 +289,7 @@ void buscarLivro(livro *livros, int qnt){
     }
 
     else{
-        printf("Opção inválida!\n");
+        printf("Opção invalida!\n");
     }
 }// Buscar livros
 
@@ -311,7 +333,7 @@ void carregarLivros(livro **livros, int *qnt){
         *livros = realloc(*livros, (*qnt + 1) * sizeof(livro));
 
         if(*livros == NULL){
-            printf("Erro de memória ao carregar livros!\n");
+            printf("Erro de memoria ao carregar livros!\n");
             fclose(arquivo);
             exit(1);
         }
@@ -331,7 +353,7 @@ void relatorioEmprestimos() {
     }
 
     char linha[500];
-    printf("-- Relatório de Empréstimos --\n");
+    printf("-- Relatorio de Emprestimos --\n");
     printf("%-8s | %-30s | %-10s\n", "CODIGO", "LEITOR", "DATA");
 
     while (fgets(linha, sizeof(linha), arquivo)) {

@@ -40,7 +40,7 @@ int main(){
             registrarEmprestimo(&livros, qnt, &emprestimos, &qntEmp);
             break;
         case 5:
-            registrarDevolucao(&livros, qnt);
+            registrarDevolucao(&livros, qnt, &emprestimos, &qntEmp);
             break;
         case 6:
             relatorioEmprestimos();
