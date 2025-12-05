@@ -109,7 +109,7 @@ void registrarDevolucao(livro **livros, int qnt, emprestimo **emprestimos, int *
     }
     getchar();
 
-    printf("Digite o nome do leitor que esta devolvendo o livro: "); //deve-se atualizar essa linha 
+    printf("Digite o nome do leitor que esta devolvendo o livro: "); 
     if(!fgets(nomeLeitor, sizeof(nomeLeitor), stdin)){
         printf("Erro ao ler nome.\n");
         return;
