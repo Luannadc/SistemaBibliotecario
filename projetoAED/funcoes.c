@@ -44,6 +44,98 @@ void cadastrarLivro(livro **livros, int *qnt){
     
 }
 
+void buscarLivro(livro *livros, int qnt){
+    if(qnt == 0){
+        printf("Nenhum livro cadastrado!\n");
+        return;
+    }
+
+    int opc;
+    printf("-- Buscar Livro --\n");
+    printf("1 - Buscar por titulo\n");
+    printf("2 - Buscar por autor\n");
+    printf("Opcao: ");
+    scanf("%d", &opc);
+    getchar();
+
+
+    // Busca por título
+    
+    if(opc == 1){
+        char busca[150];
+        printf("Digite o titulo: ");
+        fgets(busca, 150, stdin);
+        busca[strcspn(busca, "\n")] = 0;
+
+        int achou = 0;
+
+        for(int i = 0; i < qnt; i++){
+            if(strcasecmp(livros[i].titulo, busca) == 0){
+                achou = 1;
+
+                printf("\nLivro encontrado:\n");
+                printf("Codigo: %d\n", livros[i].cod);
+                printf("Titulo: %s\n", livros[i].titulo);
+                printf("Autor: %s\n", livros[i].autor);
+                printf("Ano: %d\n", livros[i].ano);
+                printf("Quantidade: %d\n\n", livros[i].qnt);
+            }
+        }
+
+        if(!achou)
+            printf("Nenhum livro encontrado com esse titulo!\n");
+    }
+
+   
+    // Busca por autor
+
+    else if(opc == 2){
+        char busca[150];
+        printf("Digite parte do nome do autor: ");
+        fgets(busca, 150, stdin);
+        busca[strcspn(busca, "\n")] = 0;
+
+        int achou = 0;
+
+        for(int i = 0; i < qnt; i++){
+            if(strcasecmp(livros[i].autor, busca) == 0){
+                achou = 1;
+
+                printf("\nLivro encontrado:\n");
+                printf("Codigo: %d\n", livros[i].cod);
+                printf("Titulo: %s\n", livros[i].titulo);
+                printf("Autor: %s\n", livros[i].autor);
+                printf("Ano: %d\n", livros[i].ano);
+                printf("Quantidade: %d\n\n", livros[i].qnt);
+            }
+        }
+
+        if(!achou)
+            printf("Nenhum autor encontrado!\n");
+    }
+
+    else{
+        printf("Opção invalida!\n");
+    }
+}// Buscar livros
+
+void listarLivro(livro *livros, int qnt){
+    if(qnt == 0){
+        printf("Nenhum livro cadastrado!\n");
+        return;
+    }
+
+    printf("\n--- Lista de Livros ---\n");
+    for(int i = 0; i < qnt; i++){
+        printf("Codigo: %d\n", livros[i].cod);
+        printf("Titulo: %s\n", livros[i].titulo);
+        printf("Autor: %s\n", livros[i].autor);
+        printf("Ano: %d\n", livros[i].ano);
+        printf("Quantidade: %d\n", livros[i].qnt);
+        printf("---------------------------\n");
+    }
+}// Listar livros
+
 void registrarEmprestimo(livro **livros, int qnt, emprestimo **emprestimos, int *qntEmp){
     emprestimo novo; //cria nova variavel do tipo emprestimo, novo
 
@@ -150,148 +242,38 @@ void registrarDevolucao(livro **livros, int qnt, emprestimo **emprestimos, int *
    
 }
 
-void salvarEmprestimo(emprestimo *emprestimos, int qnt){
-    FILE *arquivo = fopen("emprestimo.txt", "w");
-    if(!arquivo){
-        printf("Erro ao abrir 'emprestimo.txt' para escrita.\n");
-        return;
+void relatorioEmprestimos() {
+
+    FILE *arquivo = fopen("emprestimo.txt", "r");
+    if (!arquivo) {
+        printf("Erro ao abrir o arquivo.\n");
+        exit(1);
     }
 
-    for(int i = 0; i < qnt; i++){
-        fprintf(arquivo, "%d;%s;%s\n", emprestimos[i].codLivro, emprestimos[i].nomeLeitor, emprestimos[i].data); //escreve o emprestimo no arquivo txt
+    char linha[500];
+    printf("-- Relatorio de Emprestimos --\n");
+    printf("%-8s | %-30s | %-10s\n", "CODIGO", "LEITOR", "DATA");
+
+    while (fgets(linha, sizeof(linha), arquivo)) {
+
+        linha[strcspn(linha, "\r\n")] = '\0'; // remove quebra de linha
+
+        int cod;
+        char leitor[100];
+        char data[20];
+
+        int n = sscanf(linha, "%d;%[^;];%[^;]", &cod, leitor, data);
+
+        if (n != 3) {
+            // linha inválida, ignora
+            continue;
+        }
+
+        printf("%-8d | %-20s | %-10s\n", cod, leitor, data);
     }
 
     fclose(arquivo);
 }
-
-//carrega todos os emprestimos salvos no arquivo e reconstroi o vetor na memória, quando o programa é iniciado.
-void carregarEmprestimos(emprestimo **emprestimos, int *qnt){
-    emprestimo novo;
-    *qnt = 0;
-    *emprestimos = NULL;
-    
-    FILE *arquivo = fopen("emprestimo.txt", "r"); //abre o arquivo para ler e escrever; o arquivo deve existir
-    if(!arquivo){
-        return;
-    }
-
-    //ler cada linha do arquivo
-     char linha[256];
-
-    while(fgets(linha, sizeof(linha), arquivo) != NULL){ //enquanto fgets diferente de NULL 
-     char nomeTemp[100], dataTemp[20];
-
-     if(sscanf(linha, "%d;%99[^;];%19s", &novo.codLivro, nomeTemp, dataTemp) == 3){ //le a linha no formato "cod;nome;data" e verifica se os 3 campos foram lidos corretamente
-   
-         strcpy(novo.nomeLeitor, nomeTemp); //copia o nome lido (nomeTemp) para o campo nomeLeitor do novo emprestimo
-         strcpy(novo.data, dataTemp); //copia a data lida (dataTemp) para o campo data do novo emprestimo
-            
-        emprestimo *aux = realloc(*emprestimos, (*qnt + 1) * sizeof(emprestimo)); //aumenta o vetor de emprestimos na memoria para caber mais 1 registro e retorna o novo ponteiro (ou null se faltar memoria)
-         if(!aux){
-            printf("Erro ao alocar memoria.\n");
-            fclose(arquivo);
-            return;
-     }
-
-        *emprestimos = aux; //atualiza ponteiro emprestimos para apontar para a nova area de memoria realocada
-        (*emprestimos)[*qnt] = novo; //coloca o novo emprestimo na posicao final do vetor (indice *qnt)
-        (*qnt)++; //incrementa o contador para que agora temos mais 1 emprestimo na memoria
-        }
-    }
-    fclose(arquivo);
-}
-
-void listarLivro(livro *livros, int qnt){
-    if(qnt == 0){
-        printf("Nenhum livro cadastrado!\n");
-        return;
-    }
-
-    printf("\n--- Lista de Livros ---\n");
-    for(int i = 0; i < qnt; i++){
-        printf("Codigo: %d\n", livros[i].cod);
-        printf("Titulo: %s\n", livros[i].titulo);
-        printf("Autor: %s\n", livros[i].autor);
-        printf("Ano: %d\n", livros[i].ano);
-        printf("Quantidade: %d\n", livros[i].qnt);
-        printf("---------------------------\n");
-    }
-}// Listar livros
-
-void buscarLivro(livro *livros, int qnt){
-    if(qnt == 0){
-        printf("Nenhum livro cadastrado!\n");
-        return;
-    }
-
-    int opc;
-    printf("-- Buscar Livro --\n");
-    printf("1 - Buscar por titulo\n");
-    printf("2 - Buscar por autor\n");
-    printf("Opcao: ");
-    scanf("%d", &opc);
-    getchar();
-
-
-    // Busca por título
-    
-    if(opc == 1){
-        char busca[150];
-        printf("Digite o titulo: ");
-        fgets(busca, 150, stdin);
-        busca[strcspn(busca, "\n")] = 0;
-
-        int achou = 0;
-
-        for(int i = 0; i < qnt; i++){
-            if(strcasecmp(livros[i].titulo, busca) == 0){
-                achou = 1;
-
-                printf("\nLivro encontrado:\n");
-                printf("Codigo: %d\n", livros[i].cod);
-                printf("Titulo: %s\n", livros[i].titulo);
-                printf("Autor: %s\n", livros[i].autor);
-                printf("Ano: %d\n", livros[i].ano);
-                printf("Quantidade: %d\n\n", livros[i].qnt);
-            }
-        }
-
-        if(!achou)
-            printf("Nenhum livro encontrado com esse titulo!\n");
-    }
-
-   
-    // Busca por autor
-
-    else if(opc == 2){
-        char busca[150];
-        printf("Digite parte do nome do autor: ");
-        fgets(busca, 150, stdin);
-        busca[strcspn(busca, "\n")] = 0;
-
-        int achou = 0;
-
-        for(int i = 0; i < qnt; i++){
-            if(strcasecmp(livros[i].autor, busca) == 0){
-                achou = 1;
-
-                printf("\nLivro encontrado:\n");
-                printf("Codigo: %d\n", livros[i].cod);
-                printf("Titulo: %s\n", livros[i].titulo);
-                printf("Autor: %s\n", livros[i].autor);
-                printf("Ano: %d\n", livros[i].ano);
-                printf("Quantidade: %d\n\n", livros[i].qnt);
-            }
-        }
-
-        if(!achou)
-            printf("Nenhum autor encontrado!\n");
-    }
-
-    else{
-        printf("Opção invalida!\n");
-    }
-}// Buscar livros
 
 void salvarLivros(livro *livros, int qnt){
     FILE *arquivo = fopen("livros.txt", "w");
@@ -345,34 +327,52 @@ void carregarLivros(livro **livros, int *qnt){
     fclose(arquivo);
 }//Carregar livros
 
-void relatorioEmprestimos() {
-    FILE *arquivo = fopen("emprestimo.txt", "r");
-    if (!arquivo) {
-        printf("Erro ao abrir o arquivo.\n");
-        exit(1);
+void salvarEmprestimo(emprestimo *emprestimos, int qnt){
+    FILE *arquivo = fopen("emprestimo.txt", "w");
+    if(!arquivo){
+        printf("Erro ao abrir 'emprestimo.txt' para escrita.\n");
+        return;
     }
 
-    char linha[500];
-    printf("-- Relatorio de Emprestimos --\n");
-    printf("%-8s | %-30s | %-10s\n", "CODIGO", "LEITOR", "DATA");
+    for(int i = 0; i < qnt; i++){
+        fprintf(arquivo, "%d;%s;%s\n", emprestimos[i].codLivro, emprestimos[i].nomeLeitor, emprestimos[i].data); //escreve o emprestimo no arquivo txt
+    }
 
-    while (fgets(linha, sizeof(linha), arquivo)) {
+    fclose(arquivo);
+}
+//carrega todos os emprestimos salvos no arquivo e reconstroi o vetor na memória, quando o programa é iniciado.
+void carregarEmprestimos(emprestimo **emprestimos, int *qnt){
+    emprestimo novo;
+    *qnt = 0;
+    *emprestimos = NULL;
+    
+    FILE *arquivo = fopen("emprestimo.txt", "r"); //abre o arquivo para ler e escrever; o arquivo deve existir
+    if(!arquivo){
+        return;
+    }
 
-        linha[strcspn(linha, "\r\n")] = '\0'; // remove quebra de linha
+    //ler cada linha do arquivo
+     char linha[256];
 
-        int cod;
-        char leitor[100];
-        char data[20];
+    while(fgets(linha, sizeof(linha), arquivo) != NULL){ //enquanto fgets diferente de NULL 
+     char nomeTemp[100], dataTemp[20];
 
-        int n = sscanf(linha, "%d;%[^;];%[^;]", &cod, leitor, data);
+     if(sscanf(linha, "%d;%99[^;];%19s", &novo.codLivro, nomeTemp, dataTemp) == 3){ //le a linha no formato "cod;nome;data" e verifica se os 3 campos foram lidos corretamente
+   
+         strcpy(novo.nomeLeitor, nomeTemp); //copia o nome lido (nomeTemp) para o campo nomeLeitor do novo emprestimo
+         strcpy(novo.data, dataTemp); //copia a data lida (dataTemp) para o campo data do novo emprestimo
+            
+        emprestimo *aux = realloc(*emprestimos, (*qnt + 1) * sizeof(emprestimo)); //aumenta o vetor de emprestimos na memoria para caber mais 1 registro e retorna o novo ponteiro (ou null se faltar memoria)
+         if(!aux){
+            printf("Erro ao alocar memoria.\n");
+            fclose(arquivo);
+            return;
+     }
 
-        if (n != 3) {
-            // linha inválida, ignora
-            continue;
+        *emprestimos = aux; //atualiza ponteiro emprestimos para apontar para a nova area de memoria realocada
+        (*emprestimos)[*qnt] = novo; //coloca o novo emprestimo na posicao final do vetor (indice *qnt)
+        (*qnt)++; //incrementa o contador para que agora temos mais 1 emprestimo na memoria
         }
-
-        printf("%-8d | %-20s | %-10s\n", cod, leitor, data);
     }
-
     fclose(arquivo);
 }
