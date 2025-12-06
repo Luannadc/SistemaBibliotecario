@@ -139,7 +139,7 @@ void listarLivro(livro *livros, int qnt){
 void registrarEmprestimo(livro **livros, int qnt, emprestimo **emprestimos, int *qntEmp){
     emprestimo novo; //cria nova variavel do tipo emprestimo, novo
 
-    printf("Registro de Emprestimo:\n");
+    printf("---Registro de Emprestimo---\n");
     printf("Digite o codigo do livro: ");
     if(scanf("%d", &novo.codLivro) != 1){
         printf("Código Inválido.\n");
@@ -192,31 +192,32 @@ void registrarDevolucao(livro **livros, int qnt, emprestimo **emprestimos, int *
     int cod, idx = -1;
     char nomeLeitor[100];
 
-    printf("Registro de Devolucao:\n");
+    printf("---Registro de Devolucao---\n");
     printf("Digite o codigo do livro: ");
-    if(scanf("%d", &cod) != 1){
-        printf("Codigo Inválido.\n");
+    if(scanf("%d", &cod) != 1){ 
+        printf("Codigo Invalido.\n");
         getchar();
         return;
     }
     getchar();
 
     printf("Digite o nome do leitor que esta devolvendo o livro: "); 
-    if(!fgets(nomeLeitor, sizeof(nomeLeitor), stdin)){
+    if(!fgets(nomeLeitor, sizeof(nomeLeitor), stdin)){ 
         printf("Erro ao ler nome.\n");
         return;
     }
     nomeLeitor[strcspn(nomeLeitor, "\r\n")] = '\0';
 
+    //procura o livro no vetor percorrendo todos os elementos
     for(int i = 0; i < qnt; i++){
-        if((*livros)[i].cod == cod){ 
-            idx = i;
-            break;
+        if((*livros)[i].cod == cod){ //compara o codigo de cada livro com o codigo digitado
+            idx = i; //guarda a posicao do livro encontrado
+            break; //interrompe o loop assim que encontrar
         }
     }
-
+    
     if(idx == -1){
-        printf("Codigo Inválido.\n");
+        printf("Codigo Invalido.\n");
         return;
     }
 
@@ -226,13 +227,14 @@ void registrarDevolucao(livro **livros, int qnt, emprestimo **emprestimos, int *
 
     //remove o emprestimo do vetor em memoria 
     for(int i = 0; i < *qntEmp; i++){
+        //verifica se o cod do livro e o nome do leitor batem (strcmp retorna 0 se forem iguais)
         if((*emprestimos)[i].codLivro == cod && strcmp((*emprestimos)[i].nomeLeitor, nomeLeitor) == 0){
             //encontrou o emprestimo, remove deslocando os restantes + 1
             for(int j = i; j < *qntEmp - 1; j++){
-                (*emprestimos)[j] = (*emprestimos)[j + 1];
+                (*emprestimos)[j] = (*emprestimos)[j + 1]; //copia o prox elemento para posicao atual
             }
-            (*qntEmp)--;
-            break;
+            (*qntEmp)--; //diminui o contador total de emprestimos
+            break; 
         }
 
     }
@@ -254,7 +256,7 @@ void relatorioEmprestimos() {
     printf("-- Relatorio de Emprestimos --\n");
     printf("%-8s | %-30s | %-10s\n", "CODIGO", "LEITOR", "DATA");
 
-    while (fgets(linha, sizeof(linha), arquivo)) {
+    while (fgets(linha, sizeof(linha), arquivo)) { 
 
         linha[strcspn(linha, "\r\n")] = '\0'; // remove quebra de linha
 
@@ -262,6 +264,9 @@ void relatorioEmprestimos() {
         char leitor[100];
         char data[20];
 
+        // lê da string 'linha' três campos separados por ';': um inteiro (cod),
+        // uma string até ';' (leitor) e outra string até ';' (data);
+        // retorna quantos campos foram lidos com sucesso.
         int n = sscanf(linha, "%d;%[^;];%[^;]", &cod, leitor, data);
 
         if (n != 3) {
